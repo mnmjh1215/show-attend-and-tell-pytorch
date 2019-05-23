@@ -1,6 +1,6 @@
-# for some reason, torchvision.datasets.Flickr8k doesn't work...
+# for some reason, torchvision.datasets.Flickr8k doesn't work on my data,
+# which was downloaded from https://www.kaggle.com/srbhshinde/flickr8k-sau
 # so I made my own dataloader
-# data was downloaded from https://www.kaggle.com/srbhshinde/flickr8k-sau
 
 import torch
 import torchvision.transforms as transforms
@@ -57,6 +57,10 @@ class DataLoader:
         ])
 
     def get_random_minibatch(self, batch_size=Config.batch_size):
+        """
+        Returns minibatch of images and captions that have same caption length
+        This way, no computation time is wasted, and this is also the way authors of Show, Attend and Tell used.
+        """
         caption_length = self.choose_caption_length()  # randomly choose caption length
 
         # returns min(bath_size, len(data[caption_length]['captions'])) data for randomly chosen caption_length
