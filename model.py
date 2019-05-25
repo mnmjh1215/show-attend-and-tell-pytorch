@@ -12,7 +12,7 @@ from config import Config
 class Encoder(nn.Module):
     """
     An encoder that encodes each input image to tensor with shape (L, D)
-    resnet18 is used for pretrained convolutional network.
+    resnet101 is used for pretrained convolutional network.
     """
     def __init__(self, encoded_size=14, encoder_finetune=False):
         """
@@ -24,8 +24,8 @@ class Encoder(nn.Module):
 
         self.encoded_size = encoded_size
 
-        resnet18 = tvmodels.resnet18(pretrained=True)
-        layers_to_use = list(resnet18.children())[:-2]
+        resnet101 = tvmodels.resnet101(pretrained=True)
+        layers_to_use = list(resnet101.children())[:-2]
         # last two layers are AdaptiveAvgPool and Linear, which we don't need
 
         self.conv_net = nn.Sequential(*layers_to_use)

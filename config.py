@@ -8,7 +8,7 @@ class Config:
     encoded_size = 14  # size of encoded image
     encoder_finetune = False
     # decoder
-    encoder_dim = 512
+    encoder_dim = 2048
     decoder_dim = 512
     attention_dim = 512
     dropout = 0.5
@@ -22,4 +22,4 @@ class Config:
     batch_size = 32
 
     # train
-    num_epochs = 50
+    num_epochs = 30
