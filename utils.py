@@ -52,7 +52,7 @@ def load_model(encoder, decoder, checkpoint_path):
 def download_required_data():
     # first, download Flickr dataset from kaggle
     if not os.path.isdir('data/'):
-        os.path.mkdir('data/')
+        os.mkdir('data/')
     subprocess.run(['kaggle', 'datasets', 'download', 'srbhshinde/flickr8k-sau', '-p', 'data/'])
     subprocess.run(['unzip', '-q', 'data/flickr8k-sau.zip', '-d', 'data/'])
     subprocess.run(['rm', 'data/CelebA/flickr8k-sau.zip'])
