@@ -47,6 +47,9 @@ class Trainer:
             start = time.time()
             for iter in range(self.iter_per_epoch):
                 images, captions = self.dataloader.get_random_minibatch(self.batch_size)
+                images = images.to(Config.device)
+                captions = captions.to(Config.device)
+
                 loss = self.train_step(images, captions)
                 epoch_loss += loss
 

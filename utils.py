@@ -55,11 +55,12 @@ def download_required_data():
         os.mkdir('data/')
     subprocess.run(['kaggle', 'datasets', 'download', 'srbhshinde/flickr8k-sau', '-p', 'data/'])
     subprocess.run(['unzip', '-q', 'data/flickr8k-sau.zip', '-d', 'data/'])
-    subprocess.run(['rm', 'data/CelebA/flickr8k-sau.zip'])
+    subprocess.run(['rm', 'data/flickr8k-sau.zip'])
 
     # next, download glove
     subprocess.run(['wget', 'nlp.stanford.edu/data/glove.6B.zip', '-P', 'data/'])
     subprocess.run(['unzip', '-q', 'data/glove.6B.zip', '-d', 'data/'])
+    subprocess.run(['rm', 'glove.6B.zip'])
 
 
 def get_args():
