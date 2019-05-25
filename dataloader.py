@@ -37,8 +37,7 @@ class DataLoader:
                     continue
                 if not self.data.get(caption_length):
                     self.data[caption_length] = {'images': [], 'captions': []}
-                
-                
+
                 caption_tokenized = [self.word2id.get(word, self.word2id.get('<unk>')) for word in caption]
                 self.data[caption_length]['images'].append(image_filename)
                 self.data[caption_length]['captions'].append(caption_tokenized)
@@ -59,7 +58,7 @@ class DataLoader:
     def get_random_minibatch(self, batch_size=Config.batch_size):
         """
         Returns minibatch of images and captions that have same caption length
-        This way, no computation time is wasted, and this is also the way authors of Show, Attend and Tell used.
+        This way, no computation time is wasted, and this is also the method authors of Show, Attend and Tell used.
         """
         caption_length = self.choose_caption_length()  # randomly choose caption length
 
@@ -81,13 +80,14 @@ class DataLoader:
 
         return images, captions
 
-    def choose_caption_length(self):
-        # randomly choose caption length, proportionate to square root of number of data with the caption lengths
+    def choose_caption_length(self, proportion_factor=0.8):
+        # randomly choose caption length,
+        # proportional to (number of data having the caption lengths) ** proportion_factor
 
         max_len = max(self.data)
         num_data_per_length = np.array([0] * (max_len + 1))
         for key in self.data:
-            num_data_per_length[key] = np.sqrt(len(self.data[key]['images']))
+            num_data_per_length[key] = len(self.data[key]['images']) ** proportion_factor
 
         prob = num_data_per_length / sum(num_data_per_length)
 
@@ -95,3 +95,9 @@ class DataLoader:
         
         return int(choice)
 
+    def __len__(self):
+        length = 0
+        for key in self.data:
+            length += len(self.data[key]['images'])
+
+        return length

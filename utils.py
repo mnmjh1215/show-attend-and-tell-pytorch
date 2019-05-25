@@ -5,6 +5,8 @@ from config import Config
 import torchvision.utils as tvutils
 import matplotlib.pyplot as plt
 import numpy as np
+import os
+import subprocess
 
 
 def generate_word2id(caption_file):
@@ -24,10 +26,21 @@ def generate_word2id(caption_file):
     return word2id
 
 
-def load_pretrained_embedding(pretrained_path, word2id):
-    with open(pretrained_path) as pretrained:
+def load_pretrained_embedding(pretrained_path, word2id, embed_size=300):
+    vocab_size = len(word2id)
+    embedding = torch.randn((vocab_size, embed_size))
+    with open(pretrained_path) as fr:
         # TODO
-        pass
+        for line in fr:
+            line = line.lower().strip().split()
+            word = line[0]
+            vec = list(map(float, line[1:]))
+
+            if word in word2id:
+                idx = word2id[word]
+                embedding[idx] = torch.Tensor(vec)
+
+    return embedding
 
 
 def load_model(encoder, decoder, checkpoint_path):
@@ -36,8 +49,36 @@ def load_model(encoder, decoder, checkpoint_path):
     decoder.load_state_dict(checkpoint['decoder_state_dict'])
 
 
+def download_required_data():
+    # first, download Flickr dataset from kaggle
+    if not os.path.isdir('data/'):
+        os.path.mkdir('data/')
+    subprocess.run(['kaggle', 'datasets', 'download', 'srbhshinde/flickr8k-sau', '-p', 'data/'])
+    subprocess.run(['unzip', '-q', 'data/flickr8k-sau.zip', '-d', 'data/'])
+    subprocess.run(['rm', 'data/CelebA/flickr8k-sau.zip'])
+
+    # next, download glove
+    subprocess.run(['wget', 'nlp.stanford.edu/data/glove.6B.zip', '-P', 'data/'])
+    subprocess.run(['unzip', '-q', 'data/glove.6B.zip', '-d', 'data/'])
+
+
 def get_args():
     parser = argparse.ArgumentParser()
+
+    parser.add_argument('--test',
+                        action='store_true',
+                        help='use this argument to generate caption')
+
+    parser.add_argument('--image_path',
+                        help='required for testing')
+
+    parser.add_argument('--model_path',
+                        help='path to save model. required for testing. '
+                             'If not given in training, models will be trained from scratch')
+
+    parser.add_argument('--download',
+                        help='use this argument to download required files',
+                        action='store_true')
 
     # TODO
     args = parser.parse_args()

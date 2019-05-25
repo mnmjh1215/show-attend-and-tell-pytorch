@@ -14,7 +14,7 @@ class Encoder(nn.Module):
     An encoder that encodes each input image to tensor with shape (L, D)
     resnet18 is used for pretrained convolutional network.
     """
-    def __init__(self, encoded_size=14, encoder_finetune=True):
+    def __init__(self, encoded_size=14, encoder_finetune=False):
         """
 
         :param encoded_size: size of image after being encoded.
@@ -45,7 +45,7 @@ class Encoder(nn.Module):
         x = self.conv_net(images)  # (batch_size, encoder_dim, image_size/32, image_size/32
         x = self.adaptive_pool(x)  # (batch_size, encoder_dim, self.encoded_size, self.encoded_size
         x = x.permute(0, 2, 3, 1)  # (batch_size, self.encoded_size, self.encoded_size, encoder_dim
-        # since shape (batch_size, self.encoded_size ** 2, encoder_dim) will be used in decoder and attention layer, do permutation
+        # since shape (batch_size, self.encoded_size ** 2, encoder_dim) will be used in decoder, do permutation
 
         batch_size = x.shape[0]
         encoder_dim = x.shape[-1]
@@ -114,8 +114,7 @@ class Decoder(nn.Module):
 
         self.embedding = nn.Embedding(vocab_size, embed_dim)
 
-
-        self.lstm = nn.LSTM(self.encoder_dim + self.embed_dim, self.decoder_dim, bias=True)
+        self.lstm = nn.LSTMCell(self.encoder_dim + self.embed_dim, self.decoder_dim, bias=True)
         # h and c are initialized from encoder output.
         # authors used MLP, for now, use single layer perceptron
         self.init_h = nn.Linear(encoder_dim, decoder_dim, bias=False)
@@ -133,13 +132,13 @@ class Decoder(nn.Module):
             for param in self.embedding.parameters():
                 param.requires_grad = False
 
-    def load_pretrained_embeddings(self, embeddings):
-        """
+        self.embedding_finetune = embedding_finetune
 
-        :param embeddings: pretraiend embeddings, like GloVe or word2vec
-        :return:
+    def load_embedding(self, embedding):
         """
-        self.embedding.load_state_dict({'weights': embeddings})
+        :param embedding: pretraiend embedding, like GloVe or word2vec. Tensor with shape (vocab_size, embed_dim)
+        """
+        self.embedding.from_pretrained(embedding, freeze=not self.embedding_finetune)
 
     def init_hidden_states(self, encoder_output):
         """
@@ -163,11 +162,11 @@ class Decoder(nn.Module):
         """
 
         scores = self.L_o(self.dropout(embedded_caption + self.L_h(h) + self.L_z(context_vector)))
-        preds =  F.softmax(scores, dim=1)
-        return preds
+        return scores
 
     def forward(self, encoder_output, captions):
         """
+        forward method to be used at training time, because it requires captions as input
 
         :param encoder_output: encoder output, a tensor with shape (batch_size, L, encoded_dim=D)
         :param captions: captions encoded, a tensor with shape (batch_size, max_caption_length)
@@ -179,14 +178,14 @@ class Decoder(nn.Module):
         num_pixels = encoder_output.shape[1]
         max_caption_length = captions.shape[-1]
 
-        predictions = torch.zeros(batch_size, max_caption_length, self.vocab_size).to(Config.device)
-        alphas = torch.zeros(batch_size, max_caption_length, num_pixels)
+        predictions = torch.zeros(batch_size, max_caption_length - 1, self.vocab_size).to(Config.device)
+        alphas = torch.zeros(batch_size, max_caption_length - 1, num_pixels)  # save attention
 
         embedded_captions = self.embedding(captions)  # (batch_size, max_caption_length, embed_dim)
 
         h, c = self.init_hidden_states(encoder_output)
 
-        for t in range(max_caption_length - 1):  # don't need prediction when y_t-1 is <end>
+        for t in range(max_caption_length - 1):  # don't need prediction when y_t-1 is <end> or '.'
             embedded_caption_t = embedded_captions[:, t, :]  # (batch_size, embed_dim)
             context_vector, alpha = self.attention(encoder_output, h)
             # context vector has size (batch_size, encoder_dim)
@@ -199,6 +198,27 @@ class Decoder(nn.Module):
         return predictions, alphas
 
     def generate_caption_greedily(self, encoder_output):
+        """
+        greedily generate captions for encoded images.
+
+        :param encoder_output: encoder output, a tensor with shape (batch_size, L, encoded_dim)
+        :return: captions generated greedily
+        """
         # TODO
-        pass
+        h, c = self.init_hidden_states(encoder_output)
+        captions = [0]  # 0 is <start>
+        alphas = []
+        while captions[-1] != 1 and len(captions) < 30:  # 1 is '.'
+            caption = captions[-1]
+            embedded_caption = self.embedding(torch.LongTensor([caption]))  # (1, embed_dim)
+            context_vector, alpha = self.attention(encoder_output, h)  # (1, encoder_dim)
+            h, c = self.lstm(torch.cat([embedded_caption, context_vector], dim=1),
+                             (h, c))
+            preds = self.deep_output_layer(embedded_caption, h, context_vector)  # (1, vocab_size)
+            next_word = int(torch.argmax(preds, dim=1, keepdim=True).squeeze())
+            captions.append(next_word)
+            alphas.append(alpha)
+
+        return captions, alphas
+            
 
