@@ -54,11 +54,11 @@ class Trainer:
                 epoch_loss += loss
 
                 if (iter + 1) % 100 == 0:
-                    print("[{0}/{1}] [{2}/{3}] loss: {4:.4f}".format(epoch, num_epochs, iter + 1, 
+                    print("[{0}/{1}] [{2}/{3}] loss: {4:.4f}".format(epoch + 1, num_epochs, iter + 1, 
                                                                 self.iter_per_epoch, epoch_loss / (iter + 1)))
 
             # end of epoch
-            print("epoch {0} {1} seconds, loss: {2:.4f}".format(epoch + 1, time.time() - start,
+            print("epoch {0} {1:.4f} seconds, loss: {2:.4f}".format(epoch + 1, time.time() - start,
                                                                epoch_loss / self.iter_per_epoch))
             self.curr_epoch += 1
 

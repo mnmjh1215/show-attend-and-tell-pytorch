@@ -60,7 +60,7 @@ def download_required_data():
     # next, download glove
     subprocess.run(['wget', 'nlp.stanford.edu/data/glove.6B.zip', '-P', 'data/'])
     subprocess.run(['unzip', '-q', 'data/glove.6B.zip', '-d', 'data/'])
-    subprocess.run(['rm', 'glove.6B.zip'])
+    subprocess.run(['rm', 'data/glove.6B.zip'])
 
 
 def get_args():

@@ -22,4 +22,4 @@ class Config:
     batch_size = 32
 
     # train
-    num_epochs = 25
+    num_epochs = 50
