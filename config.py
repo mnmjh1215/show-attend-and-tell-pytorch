@@ -5,7 +5,7 @@ import torch
 class Config:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # encoder
-    encoded_size = 14  # size of encoded image
+    encoded_size = 7  # size of encoded image
     encoder_finetune = False
     # decoder
     encoder_dim = 2048
@@ -22,4 +22,4 @@ class Config:
     batch_size = 32
 
     # train
-    num_epochs = 30
+    num_epochs = 40
