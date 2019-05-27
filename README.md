@@ -35,7 +35,7 @@ Following examples are generated after training using Google Colaboratory for le
 
 * Correct examples
 
-  ![correct1](./images/Flickr8k/correct1.png)
+![correct1](./images/Flickr8k/correct1.png)
 
 ![correct2](./images/Flickr8k/correct2.png)
 
@@ -51,7 +51,7 @@ Following examples are generated after training using Google Colaboratory for le
 
 * Not 100% correct, but not totally wrong examples
 
-  ![not_correct1](./images/Flickr8k/not_correct.png)
+![not_correct1](./images/Flickr8k/not_correct.png)
 
 ![not_correct2](./images/Flickr8k/not_correct2.png)
 
@@ -59,6 +59,6 @@ Following examples are generated after training using Google Colaboratory for le
 
 * Wrong examples
 
-  ![wrong](./images/Flickr8k/wrong.png)
+![wrong](./images/Flickr8k/wrong.png)
 
 ![wrong2](./images/Flickr8k/wrong2.png)
