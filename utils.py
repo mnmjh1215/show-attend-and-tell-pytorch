@@ -81,6 +81,10 @@ def get_args():
                         help='use this argument to download required files',
                         action='store_true')
 
+    parser.add_argument('--lemmatize',
+                        help='use this argument to use lemmatized training captions',
+                        action='store_true')
+
     # TODO
     args = parser.parse_args()
 

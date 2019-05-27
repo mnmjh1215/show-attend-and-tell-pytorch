@@ -124,7 +124,12 @@ class Trainer:
         self.decoder.load_state_dict(checkpoint['decoder_state_dict'])
     
         if self.encoder_optimizer:
-            self.encoder_optimizer.load_state_dict(checkpoint['encoder_optimizer_state_dict'])
+            try:
+                self.encoder_optimizer.load_state_dict(checkpoint['encoder_optimizer_state_dict'])
+            except:
+                # encoder_optimizer_state_dict does not exist in checkpoint.
+                # just pass
+                pass
         self.decoder_optimizer.load_state_dict(checkpoint['decoder_optimizer_state_dict'])
         self.curr_epoch = checkpoint['epoch']
         self.loss_hist = checkpoint['loss_hist']

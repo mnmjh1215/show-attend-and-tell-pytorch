@@ -19,8 +19,13 @@ def main(args):
         print("Downloading data")
         download_required_data()
 
+    if args.lemmatize:
+        caption_file = 'data/Flickr_Data/Flickr_TextData/Flickr8k.lemma.token.txt'
+    else:
+        caption_file = 'data/Flickr_Data/Flickr_TextData/Flickr8k.token.txt'
+
     print("Generating word2id")
-    word2id = generate_word2id('data/Flickr_Data/Flickr_TextData/Flickr8k.lemma.token.txt')
+    word2id = generate_word2id(caption_file)
     id2word = dict([(v, k) for k, v in word2id.items()])
 
     print("Loading Encoder and Decoder")
@@ -42,7 +47,7 @@ def main(args):
     if not args.test:
         # train
         print("Loading DataLoader and Trainer")
-        dloader = DataLoader('data/Flickr_Data/Flickr_TextData/Flickr8k.lemma.token.txt', 'data/Flickr_Data/Images')
+        dloader = DataLoader(caption_file, 'data/Flickr_Data/Images')
         trainer = Trainer(encoder, decoder, dloader)
 
         print("Start Training")
