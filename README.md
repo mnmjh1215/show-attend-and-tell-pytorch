@@ -31,9 +31,9 @@ Lastly, to download required data (Flickr8k and GloVe, for now), use '--download
 
 ### Flickr8k dataset
 
-Following examples are generated after training using Google Colaboratory for less than 7 hours. Training captions are lemmatized, thus so is generated captions. Therefore generated captions are not complete English sentence, but they are still interpretable. (Lemmatization helps training when resource is limited, because it reduces vocabulary size.)
+Following examples are generated after training using Google Colaboratory for less than 7 hours. Training captions are lemmatized, and so are generated captions. Thus generated captions are not complete English sentences, but they are still interpretable. (Lemmatization helps training when resource is limited, because it reduces vocabulary size.)
 
-(There are a lot of examples with dogs, because dogs are cute!)
+(A lot of examples have dogs, because dogs are cute!)
 
 * Correct examples
 
