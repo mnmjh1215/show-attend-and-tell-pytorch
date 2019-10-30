@@ -25,7 +25,7 @@ class Encoder(nn.Module):
         self.encoded_size = encoded_size
 
         resnet101 = tvmodels.resnet101(pretrained=True)
-        layers_to_use = list(resnet101.children())[:-2]
+        layers_to_use = list(resnet101.children())[:-3]
         # last two layers are AdaptiveAvgPool and Linear, which we don't need
 
         self.conv_net = nn.Sequential(*layers_to_use)
